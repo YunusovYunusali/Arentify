@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rentify — Ijara bozori</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <img src="Gemini_Generated_Image_iuc8ksiuc8.png" alt="Rentify logo">
+      <span>Rent<span>ify</span></span>
+    </div>
+    <div class="search-bar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="search-input" placeholder="Asbob, avtomobil, uskuna..." oninput="filterItems()">
+    </div>
+    <div class="header-loc" onclick="getLocation()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+      <span id="loc-label">Joylashuv</span>
+    </div>
+    <a href="https://yrentify.vercel.app" target="_blank" class="btn-owner">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Ijarachilar kabineti
+    </a>
+  </div>
+</header>
+
+<div class="filters">
+  <div class="filters-inner">
+    <button class="filter-pill active" onclick="setFilter('all',this)">Hammasi</button>
+    <button class="filter-pill" onclick="setFilter('tools',this)">🔧 Asboblar</button>
+    <button class="filter-pill" onclick="setFilter('cars',this)">🚗 Avtomobil</button>
+    <button class="filter-pill" onclick="setFilter('gaming',this)">🎮 Gaming</button>
+    <button class="filter-pill" onclick="setFilter('free',this)">✅ Bo'sh</button>
+    <button class="filter-pill" onclick="setFilter('cheap',this)">💰 Arzon</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <div id="loc-banner" class="loc-banner" style="display:none">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+    <div class="loc-banner-text">Yaqin ijarachilarni ko'rish uchun joylashuvingizni yoqing</div>
+    <button class="loc-banner-btn" onclick="getLocation()">Yoqish</button>
+  </div>
+
+  <div id="shops-section">
+    <div class="section-title">Yaqin ijarachilar <span id="shops-count" style="font-size:14px;font-weight:400;color:var(--muted)"></span></div>
+    <div class="shops-row" id="shops-row">
+      <div class="skeleton" style="width:180px;height:56px;flex-shrink:0;border-radius:var(--radius)"></div>
+      <div class="skeleton" style="width:180px;height:56px;flex-shrink:0;border-radius:var(--radius)"></div>
+      <div class="skeleton" style="width:180px;height:56px;flex-shrink:0;border-radius:var(--radius)"></div>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-bottom:4px">Mahsulotlar</div>
+  <div class="section-sub" id="items-sub" style="margin-bottom:16px">Barcha ijarachilar katalogi</div>
+  <div class="items-grid" id="items-grid">
+    <div class="skeleton" style="height:260px;border-radius:var(--radius)"></div>
+    <div class="skeleton" style="height:260px;border-radius:var(--radius)"></div>
+    <div class="skeleton" style="height:260px;border-radius:var(--radius)"></div>
+    <div class="skeleton" style="height:260px;border-radius:var(--radius)"></div>
+  </div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="closeModal(event)">
+  <div class="modal" id="modal">
+    <button class="modal-close" onclick="closeModalBtn()">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
