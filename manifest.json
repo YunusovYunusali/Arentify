@@ -1,0 +1,22 @@
+{
+  "name": "Rentify — Ijara bozori",
+  "short_name": "Rentify",
+  "description": "Yaqin atrofdagi ijarachilarni toping",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "Gemini_Generated_Image_iuc8ksiuc8ksiuc8.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "Gemini_Generated_Image_iuc8ksiuc8ksiuc8.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
