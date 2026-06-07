@@ -68,9 +68,12 @@ async function loadData() {
       allShops.push(shop);
 
       const activeRentals = rentals.filter(r => r.status === 'active' || r.status === 'jarayonda');
-      const busyItemIds = new Set();
+      const busyCountMap = {};
       activeRentals.forEach(r => {
-        if (r.items) r.items.forEach(it => busyItemIds.add(it.itemId || it.toolId));
+        if (r.items) r.items.forEach(it => {
+          const id = String(it.itemId !== undefined ? it.itemId : it.toolId);
+          busyCountMap[id] = (busyCountMap[id] || 0) + (it.qty || 1);
+        });
       });
 
       const allProducts = [...tools, ...items];
@@ -84,7 +87,9 @@ async function loadData() {
           shopLng: shop.lng,
           shopAddress: shop.address,
           shopCategory: info.category || 'tools',
-          isBusy: busyItemIds.has(item.id)
+          isBusy: (busyCountMap[String(item.id)] || 0) > 0,
+          busyQty: busyCountMap[String(item.id)] || 0,
+          availableQty: Math.max(0, (item.qty || 1) - (busyCountMap[String(item.id)] || 0))
         });
       });
     });
@@ -177,6 +182,16 @@ function renderItems() {
   const grid = document.getElementById('items-grid');
   const sub = document.getElementById('items-sub');
   const list = getFilteredItems();
+  // update summary (available vs rented) for current list
+    try {
+    const total = list.length;
+    const rented = list.filter(i => typeof i.availableQty !== 'undefined' ? i.availableQty === 0 : (i.isBusy?1:0)).length;
+    const available = total - rented;
+    const summaryEl = document.getElementById('items-summary');
+    if (summaryEl) summaryEl.textContent = `Bo'sh: ${available} · Ijarada: ${rented} · Jami: ${total}`;
+    const headerAvail = document.getElementById('available-count');
+    if (headerAvail) headerAvail.textContent = `Bo'sh: ${available}`;
+  } catch(e) { console.warn('Summary update failed', e); }
   if (!list.length) {
     grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">📦</div><p>Mahsulot topilmadi</p></div>';
     sub.textContent = '';
@@ -195,9 +210,10 @@ function renderItems() {
         <div class="item-cat">${CAT_NAMES[item.shopCategory]||''}</div>
         <div class="item-name">${name}</div>
         <div class="item-shop">🏪 ${item.shopName}${distText}</div>
+        ${item.qty ? `<div style="font-size:13px;color:var(--muted);margin:6px 0 8px">Umumiy soni: ${item.qty} ta${typeof item.availableQty !== 'undefined' ? ' · Bo\'sh: '+item.availableQty+' ta' : ''}</div>` : ''}
         <div class="item-footer">
           <div class="item-price">${price} <span>so'm/kun</span></div>
-          <span class="${item.isBusy?'badge-busy':'badge-free'}">${item.isBusy?'Ijarada':'Bo\'sh'}</span>
+          <span class="${item.isBusy?'badge-busy':'badge-free'}">${item.availableQty===0?'Ijarada':item.availableQty+' ta qoldi'}</span>
         </div>
       </div>
     </div>`;
@@ -205,6 +221,10 @@ function renderItems() {
 }
 
 function openItem(item) {
+  if (typeof item.availableQty === 'undefined' && item && item.id) {
+    const orig = allItems.find(i => i.id === item.id);
+    if (orig) item = orig;
+  }
   const name = getItemName(item);
   const img = getItemImage(item);
   const icon = CAT_ICONS[item.shopCategory] || '📦';
@@ -219,11 +239,15 @@ function openItem(item) {
     <div class="modal-cat">${CAT_NAMES[item.shopCategory]||''}</div>
     <div class="modal-name">${name}</div>
     ${item.type ? `<div style="font-size:13px;color:var(--muted);margin-bottom:8px">Turi: ${item.type}</div>` : ''}
-    ${item.qty ? `<div style="font-size:13px;color:var(--muted);margin-bottom:8px">Umumiy soni: ${item.qty} ta</div>` : ''}
+    ${item.qty ? `<div style="font-size:13px;color:var(--muted);margin-bottom:8px">
+  Umumiy: ${item.qty} ta  · 
+  Bo'sh: ${item.availableQty} ta  · 
+  Ijarada: ${item.busyQty} ta
+</div>` : ''}
     <div class="modal-price-row">
       <div class="modal-price">${price}</div>
       <div class="modal-price-label">so'm / kun</div>
-      <span class="${item.isBusy?'badge-busy':'badge-free'}" style="margin-left:auto">${item.isBusy?'Ijarada':'Bo\'sh'}</span>
+      <span class="${item.isBusy?'badge-busy':'badge-free'}" style="margin-left:auto">${item.availableQty===0?'Ijarada':item.availableQty+' ta qoldi'}</span>
     </div>
     <div class="modal-divider"></div>
     <div class="modal-shop-row">
